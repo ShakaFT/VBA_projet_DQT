@@ -1,0 +1,31 @@
+Option Explicit
+
+Public Function maxRankNumber() As Long
+    
+    Dim currentMaxRank As String
+    
+    currentMaxRank = SheetData.Range("TableMonster").Cells(1, 1)
+    maxRankNumber = rankNumber(currentMaxRank)
+    
+End Function
+
+Public Function RankLetter(ByVal rankMonster As String) As String
+    
+    RankLetter = Left(rankMonster, 1)
+    
+End Function
+
+Public Function rankNumber(ByVal rankMonster As String) As Long
+    
+    rankNumber = CLng(mid(rankMonster, 2))
+
+End Function
+
+Public Function GetRankMonster(ByVal Target As Range) As String
+    
+    Dim rankRow As Long
+    
+    rankRow = Target.Row - SheetData.Range("TableMonster").Cells(0, 1).Row
+    GetRankMonster = SheetData.Range("TableMonster").Cells(rankRow, 1)
+    
+End Function

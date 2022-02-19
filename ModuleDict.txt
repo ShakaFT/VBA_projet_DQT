@@ -1,0 +1,126 @@
+Option Explicit
+
+'*****************************************************************************
+' Cette fonction retourne un dictionnaire contenant les DonneesFixes
+'*****************************************************************************
+Public Function GetMonsterDict() As Object
+    
+    Dim MONSTER_DICT As Object
+    Set MONSTER_DICT = CreateObject("Scripting.Dictionary")
+    
+    MONSTER_DICT.Add "Info", Array("Crystal", "Sphere", "Pearl", "Orb", "Iridescent Orb", "Illustrious Iris", "Stone1", "Stone2", "Stone3", "Gold")
+    
+    MONSTER_DICT.Add "F0", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 50)
+    MONSTER_DICT.Add "F1", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 100)
+    MONSTER_DICT.Add "F2", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 200)
+    MONSTER_DICT.Add "F3", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 400)
+    MONSTER_DICT.Add "F4", Array(0, 0, 0, 1, 0, 0, 0, 0, 0, 800)
+    MONSTER_DICT.Add "F5", Array(0, 0, 0, 3, 0, 0, 0, 0, 0, 1600)
+    MONSTER_DICT.Add "F6", Array(0, 0, 0, 5, 0, 0, 32, 30, 0, 1600)
+    
+    MONSTER_DICT.Add "E0", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 50)
+    MONSTER_DICT.Add "E1", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 100)
+    MONSTER_DICT.Add "E2", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 200)
+    MONSTER_DICT.Add "E3", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 400)
+    MONSTER_DICT.Add "E4", Array(0, 0, 0, 1, 0, 0, 0, 0, 0, 800)
+    MONSTER_DICT.Add "E5", Array(0, 0, 3, 5, 0, 0, 0, 0, 0, 1600)
+    MONSTER_DICT.Add "E6", Array(0, 0, 5, 8, 0, 0, 32, 0, 0, 1600)
+    
+    MONSTER_DICT.Add "D0", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 50)
+    MONSTER_DICT.Add "D1", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 100)
+    MONSTER_DICT.Add "D2", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 200)
+    MONSTER_DICT.Add "D3", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 400)
+    MONSTER_DICT.Add "D4", Array(0, 0, 0, 1, 0, 0, 0, 0, 0, 800)
+    MONSTER_DICT.Add "D5", Array(0, 3, 0, 0, 0, 0, 16, 10, 0, 1600)
+    MONSTER_DICT.Add "D6", Array(0, 3, 8, 12, 0, 0, 48, 0, 0, 1600)
+    
+    MONSTER_DICT.Add "C0", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 50)
+    MONSTER_DICT.Add "C1", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 100)
+    MONSTER_DICT.Add "C2", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 200)
+    MONSTER_DICT.Add "C3", Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 400)
+    MONSTER_DICT.Add "C4", Array(0, 0, 0, 1, 0, 0, 0, 0, 0, 800)
+    MONSTER_DICT.Add "C5", Array(0, 5, 0, 0, 0, 0, 16, 10, 0, 1600)
+    MONSTER_DICT.Add "C6", Array(0, 5, 12, 18, 0, 0, 0, 0, 0, 1600)
+    
+    MONSTER_DICT.Add "B0", Array(0, 0, 0, 0, 0, 0, 1, 1, 1, 100)
+    MONSTER_DICT.Add "B1", Array(0, 0, 0, 0, 0, 0, 3, 2, 1, 200)
+    MONSTER_DICT.Add "B2", Array(0, 0, 0, 0, 0, 0, 5, 3, 1, 400)
+    MONSTER_DICT.Add "B3", Array(0, 0, 0, 4, 0, 0, 6, 4, 2, 800)
+    MONSTER_DICT.Add "B4", Array(0, 0, 3, 0, 0, 0, 8, 5, 0, 1600)
+    MONSTER_DICT.Add "B5", Array(0, 8, 0, 0, 0, 1, 16, 10, 0, 3200)
+    MONSTER_DICT.Add "B6", Array(0, 8, 18, 0, 0, 1, 64, 0, 0, 3200)
+    
+    MONSTER_DICT.Add "A0", Array(0, 0, 0, 0, 0, 0, 5, 3, 1, 200)
+    MONSTER_DICT.Add "A1", Array(0, 0, 0, 5, 0, 0, 9, 6, 3, 400)
+    MONSTER_DICT.Add "A2", Array(0, 0, 0, 5, 0, 0, 13, 9, 0, 800)
+    MONSTER_DICT.Add "A3", Array(0, 0, 5, 0, 0, 0, 17, 12, 0, 1600)
+    MONSTER_DICT.Add "A4", Array(0, 0, 3, 0, 0, 1, 27, 20, 0, 3200)
+    MONSTER_DICT.Add "A5", Array(0, 12, 8, 0, 0, 5, 46, 0, 0, 6400)
+    MONSTER_DICT.Add "A6", Array(1, 12, 0, 28, 0, 5, 0, 0, 0, 6400)
+    
+    MONSTER_DICT.Add "S0", Array(0, 0, 0, 0, 0, 0, 8, 6, 4, 400)
+    MONSTER_DICT.Add "S1", Array(0, 0, 0, 7, 0, 0, 16, 12, 0, 800)
+    MONSTER_DICT.Add "S2", Array(0, 0, 7, 5, 0, 0, 24, 18, 0, 1600)
+    MONSTER_DICT.Add "S3", Array(0, 0, 5, 0, 0, 5, 32, 24, 0, 3200)
+    MONSTER_DICT.Add "S4", Array(0, 0, 5, 0, 1, 0, 47, 35, 0, 6400)
+    MONSTER_DICT.Add "S5", Array(0, 16, 20, 0, 1, 8, 0, 0, 0, 10000)
+    MONSTER_DICT.Add "S6", Array(2, 16, 24, 0, 0, 8, 0, 0, 0, 10000)
+    
+    Set GetMonsterDict = MONSTER_DICT
+    
+End Function
+
+'*****************************************************************************
+' Cette fonction retourne un dictionnaire contenant les DonneesMysteres
+'*****************************************************************************
+Public Function GetMysteryDict() As Object
+
+    Dim MYSTERY_DICT As Object
+    Set MYSTERY_DICT = CreateObject("Scripting.Dictionary")
+    
+    MYSTERY_DICT.Add "Info", Array("Crystal", "Sphere", "Pearl", "Orb", "Iridescent Orb", "Illustrious Iris", "Emerald", "Sapphire", "Ruby", "Gold")
+    
+    MYSTERY_DICT.Add "B0", Array(0, 0, 0, 0, 0, 0, 1, 1, 1, 100)
+    MYSTERY_DICT.Add "B1", Array(0, 0, 0, 0, 0, 0, 2, 2, 3, 200)
+    MYSTERY_DICT.Add "B2", Array(0, 0, 0, 0, 0, 0, 3, 3, 5, 400)
+    MYSTERY_DICT.Add "B3", Array(0, 0, 0, 4, 0, 0, 4, 4, 6, 800)
+    MYSTERY_DICT.Add "B4", Array(0, 0, 3, 0, 0, 0, 5, 5, 0, 1600)
+    MYSTERY_DICT.Add "B5", Array(0, 8, 0, 0, 0, 1, 10, 16, 0, 3200)
+    MYSTERY_DICT.Add "B6", Array(0, 8, 18, 0, 0, 1, 0, 0, 64, 3200)
+    
+    MYSTERY_DICT.Add "S0", Array(0, 0, 0, 0, 0, 0, 6, 6, 6, 400)
+    MYSTERY_DICT.Add "S1", Array(0, 0, 0, 7, 0, 0, 12, 0, 12, 800)
+    MYSTERY_DICT.Add "S2", Array(0, 0, 7, 5, 0, 0, 23, 0, 18, 1600)
+    MYSTERY_DICT.Add "S3", Array(0, 0, 5, 0, 0, 5, 30, 27, 0, 3200)
+    MYSTERY_DICT.Add "S4", Array(0, 0, 5, 0, 1, 0, 0, 38, 35, 6400)
+    MYSTERY_DICT.Add "S5", Array(0, 16, 20, 0, 1, 8, 0, 0, 0, 10000)
+    MYSTERY_DICT.Add "S6", Array(2, 16, 24, 0, 0, 8, 0, 0, 0, 10000)
+    
+    Set GetMysteryDict = MYSTERY_DICT
+
+End Function
+
+'*****************************************************************************
+' Cette fonction retourne un dictionnaire contenant les TypePrio
+'*****************************************************************************
+Public Function GetStoneDict() As Object
+    
+    Dim STONE_DICT As Object
+    Set STONE_DICT = CreateObject("Scripting.Dictionary")
+    
+    STONE_DICT.Add "B", "Sapphire"
+    STONE_DICT.Add "G", "Emerald"
+    STONE_DICT.Add "R", "Ruby"
+    
+    STONE_DICT.Add "Slime", Array("B", "G", "R")
+    STONE_DICT.Add "Dragon", Array("B", "R", "G")
+    STONE_DICT.Add "Nature", Array("B", "R", "G")
+    STONE_DICT.Add "Beast", Array("R", "G", "B")
+    STONE_DICT.Add "Inorganic", Array("G", "R", "B")
+    STONE_DICT.Add "Demon", Array("G", "B", "R")
+    STONE_DICT.Add "Undead", Array("R", "G", "B")
+    STONE_DICT.Add "Hero", Array("G", "B", "R")
+    
+    Set GetStoneDict = STONE_DICT
+    
+End Function

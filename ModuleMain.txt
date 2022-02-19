@@ -1,0 +1,91 @@
+Option Explicit
+
+Public Function GetResource(ByVal currentRankLetter As String, ByVal rankInfNumber As Long, ByVal rankSupNumber As Long, _
+                            ByVal typeMonster As String) As Long()
+    
+    Dim rank As String
+    Dim counter As Long, rankNumber As Long
+    Dim tabCumulResource() As Long
+    Dim MONSTER_DICT As Object
+    Dim resourceQuantity As Variant
+    
+    ReDim tabCumulResource(GetNbItem())
+    Set MONSTER_DICT = Monster.Dict(typeMonster)
+    
+    For rankNumber = rankInfNumber To rankSupNumber - 1
+        
+        rank = currentRankLetter & rankNumber
+        counter = 0
+        
+        For Each resourceQuantity In MONSTER_DICT(rank)
+            If resourceQuantity = 0 Then GoTo EndLoop
+            tabCumulResource(counter) = tabCumulResource(counter) + resourceQuantity
+EndLoop:
+            counter = counter + 1
+        Next resourceQuantity
+    Next rankNumber
+    
+    GetResource = tabCumulResource
+    
+End Function
+
+
+Public Sub Edit(ByRef tabCumulResource() As Long, ByVal typeMonster As String, ByVal quantity As Long, ByVal itemStr As String, ByVal otherStr As String)
+    
+    Dim item As String
+    Dim i As Long, stoneNumber As Long, column As Long
+    Dim modifiedCell As Range
+    Dim MONSTER_DICT As Object
+    Dim resourceQuantity As Variant
+    
+    Set MONSTER_DICT = Monster.Dict(typeMonster)
+    
+    For Each resourceQuantity In tabCumulResource
+        If resourceQuantity = 0 Then GoTo EndLoop
+        item = MONSTER_DICT("Info")(i)
+        
+        Select Case i
+        Case 0, 1, 2, 3
+            column = SheetData.ListObjects(itemStr).ListColumns(typeMonster).Index
+            Set modifiedCell = SheetData.Range(itemStr).Find(item).Offset(0, column - 1)
+        Case Else
+        
+            If InStr(item, "Stone") <> 0 And typeMonster <> "???" Then
+                stoneNumber = Right(item, 1)
+                item = StoneName(stoneNumber, typeMonster)
+            End If
+            
+            column = SheetData.ListObjects(otherStr).ListColumns(item).Index
+            Set modifiedCell = SheetData.Range(otherStr).Cells(1, column)
+        End Select
+        
+        Application.EnableEvents = False
+        modifiedCell = modifiedCell + resourceQuantity * quantity
+        Application.EnableEvents = True
+EndLoop:
+        i = i + 1
+    Next resourceQuantity
+    
+End Sub
+
+'*****************************************************************************
+' Cette fonction reçoit en paramètre le numéro de la gemme demandé (1, 2 ou 3) et le type du monstre
+' Elle retourne le nom de la gemme en question
+'*****************************************************************************
+Public Function StoneName(ByVal nbStone As Long, ByVal typeMonster As String) As String
+    
+    Dim letter As String
+    Dim STONE_DICT As Object
+    
+    Set STONE_DICT = ModuleDict.GetStoneDict
+    
+    letter = STONE_DICT(typeMonster)(nbStone - 1)
+    StoneName = STONE_DICT(letter)
+
+End Function
+
+Public Function GetNbItem() As Long
+
+    GetNbItem = SheetData.Range("TotalCostItem").Rows.Count + SheetData.Range("TotalCostOther").Columns.Count
+
+End Function

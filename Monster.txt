@@ -1,0 +1,20 @@
+Option Explicit
+
+Public Function GetTypeMonster(ByVal Target As Range) As String
+    
+    Dim nbColumn As Long
+    
+    nbColumn = Target.column - SheetData.Range("TableMonster").Cells(0, 1).column + 1
+    GetTypeMonster = SheetData.Range("TableMonster").Cells(0, nbColumn)
+    
+End Function
+
+Public Function Dict(ByVal typeMonster As String) As Object
+    
+    If typeMonster <> "???" Then
+        Set Dict = ModuleDict.GetMonsterDict
+    Else
+        Set Dict = ModuleDict.GetMysteryDict
+    End If
+    
+End Function

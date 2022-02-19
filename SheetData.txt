@@ -1,0 +1,250 @@
+Option Explicit
+
+' Cette variable globale représente l'ancienne valeur avant la modification
+Dim oldValue As Variant
+
+'*****************************************************************************
+' Cette procédure affecte, à chaque fois que l'utilisateur clique sur une cellule,
+' la valeur de la cellule en question dans la variable globale oldValue
+'*****************************************************************************
+Public Sub Worksheet_SelectionChange(ByVal Target As Range)
+    If Target.Count > 1 Then Exit Sub
+    oldValue = Target.value
+End Sub
+
+'*****************************************************************************
+' Cette procédure s'exécute lorsqu'une cellule de la SheetData est modifiée
+'*****************************************************************************
+Private Sub Worksheet_Change(ByVal Target As Range)
+    
+    Dim rankMonster As String, typeMonster As String, currentRankLetter As String, currentMaxRank As String
+    Dim nbUp As Long, quantity As Long, bug As Long, currentRankNumber As Long, newRankNumber As Long, maxRankNumber As Long
+    Dim tableStock() As Long, tableTotalCost() As Long
+    Dim MYSTERY_DICT As Object
+    
+    maxRankNumber = rank.maxRankNumber()
+    
+' Conditions d'arrêt
+    If Target.Count > 1 Then
+        Exit Sub
+    ElseIf Not (Intersect(Target, GetTableUp) Is Nothing) And (Not IsNumeric(Target) Or Target < 1 Or maxRankNumber + 1 < Target) Then
+        Application.EnableEvents = False
+        Target = oldValue
+        Application.EnableEvents = True
+        Exit Sub
+    ElseIf Intersect(Target, GetTableMonster) Is Nothing Or Target = oldValue Then
+        Exit Sub
+    ElseIf Not IsNumeric(Target) Or Target < 0 Or Target = "" Then
+        Application.EnableEvents = False
+        Target = oldValue
+        Application.EnableEvents = True
+        Exit Sub
+    End If
+    
+' On récupère le type et le rang du monstre
+    rankMonster = rank.GetRankMonster(Target)
+    typeMonster = Monster.GetTypeMonster(Target)
+
+'On empêche d'ajouter des monstres mystères encore inexistants
+    
+    If typeMonster = "???" Then
+        Set MYSTERY_DICT = ModuleDict.GetMysteryDict
+        On Error Resume Next
+        bug = MYSTERY_DICT(rankMonster)(0)
+        If (Err.Number > 0) Then
+            Application.EnableEvents = False
+            Target = 0
+            Application.EnableEvents = True
+            Exit Sub
+        End If
+    End If
+    
+    currentRankLetter = rank.RankLetter(rankMonster)
+    currentRankNumber = rank.rankNumber(rankMonster)
+    quantity = oldValue - Target
+    
+    If quantity > 0 Then 'Alors c'est une décrémentation
+        
+        nbUp = CLng(SheetData.Range("TableUp").Cells(1, 1))
+        newRankNumber = currentRankNumber + nbUp
+        
+        Increment Target, newRankNumber, maxRankNumber, nbUp, quantity
+        
+        If newRankNumber > maxRankNumber Then
+            newRankNumber = maxRankNumber + 1
+        End If
+        
+        tableTotalCost = ModuleMain.GetResource(currentRankLetter, currentRankNumber, newRankNumber, typeMonster)
+        ModuleMain.Edit tableTotalCost, typeMonster, -quantity, "StockItem", "StockOther" 'Modifier Stock
+        
+    Else 'Alors c'est une incrémentation
+        tableStock = ModuleMain.GetResource(currentRankLetter, 0, currentRankNumber, typeMonster)
+        tableTotalCost = ModuleMain.GetResource(currentRankLetter, currentRankNumber, maxRankNumber + 1, typeMonster)
+        ModuleMain.Edit tableStock, typeMonster, quantity, "StockItem", "StockOther" 'Modifier Stock
+    End If
+    
+    ModuleMain.Edit tableTotalCost, typeMonster, -quantity, "TotalCostItem", "TotalCostOther" 'Modifier CoutTotal
+    
+End Sub
+
+'*****************************************************************************
+'
+'*****************************************************************************
+Public Sub Increment(ByVal decrementedCell As Range, ByVal newRankNumber As Long, ByVal maxRankNumber As Long, _
+                     ByVal nbUp As Long, ByVal quantity As Long)
+
+    Dim incrementedCell As Range
+    
+    If newRankNumber > maxRankNumber Then Exit Sub   'Le perso est donc rg7
+    
+    Set incrementedCell = decrementedCell.Offset(-nbUp, 0)
+    Application.EnableEvents = False
+    incrementedCell = incrementedCell + quantity
+    Application.EnableEvents = True
+    
+End Sub
+
+'*****************************************************************************
+' Cette procédure s'exécute lorsque l'utilisateur clique sur le CommandButtonReload
+' Elle permet de mettre à jours les données du coût total
+'*****************************************************************************
+Private Sub CommandButtonReload_Click()
+    
+    Dim rankMonster As String, typeMonster As String, currentRankLetter As String
+    Dim currentRankNumber As Long, maxRankNumber As Long, tableCost() As Long
+    Dim value As Range
+    Dim msg As Variant
+    
+    msg = MsgBox("Attention ! Toutes vos données vont être mises à jour, êtes-vous vraiment sûr ?", vbYesNo + vbExclamation, "Mise à jour")
+    If msg = vbNo Then Exit Sub
+    
+    Application.EnableEvents = False
+    GetTotalCostItem = 0
+    GetTotalCostOther = 0
+    Application.EnableEvents = True
+    
+    maxRankNumber = rank.maxRankNumber()
+    
+    For Each value In SheetData.Range("TableMonster")
+        If Not IsNumeric(value) Or value = "0" Then GoTo EndLoop
+        
+        rankMonster = rank.GetRankMonster(value)
+        typeMonster = Monster.GetTypeMonster(value)
+        
+        currentRankLetter = rank.RankLetter(rankMonster)
+        currentRankNumber = rank.rankNumber(rankMonster)
+        
+        tableCost = ModuleMain.GetResource(currentRankLetter, currentRankNumber, maxRankNumber + 1, typeMonster)
+        ModuleMain.Edit tableCost, typeMonster, value, "TotalCostItem", "TotalCostOther" 'Modifier Stock
+        
+EndLoop:
+    Next value
+
+End Sub
+
+'*****************************************************************************
+' Cette procédure s'exécute lorsque l'utilisateur clique sur le CommandButtonReset
+' Elle remet à 0 toutes les valeurs des tableaux
+'*****************************************************************************
+Private Sub CommandButtonReset_Click()
+    
+    Dim tableMonster As Range, stockItem As Range, stockOther As Range, totalCostItem As Range, totalCostOther As Range, tableUp As Range
+    Dim msg As Variant
+    
+    msg = MsgBox("Attention ! Toutes vos données vont être supprimées, êtes-vous vraiment sûr ?", vbYesNo + vbExclamation, "Remise à zéro")
+    If msg = vbNo Then Exit Sub
+    
+    Set tableMonster = GetTableMonster
+    Set stockItem = GetStockItem
+    Set stockOther = GetStockOther
+    Set totalCostItem = GetTotalCostItem
+    Set totalCostOther = GetTotalCostOther
+    Set tableUp = GetTableUp
+    
+    Application.EnableEvents = False
+    tableMonster = 0
+    stockItem = 0
+    stockOther = 0
+    totalCostItem = 0
+    totalCostOther = 0
+    tableUp = 1
+    Application.EnableEvents = True
+    
+End Sub
+
+'*****************************************************************************
+' Cette fonction retourne une référence à la TableMonster
+'*****************************************************************************
+Public Function GetTableMonster() As Range
+    
+    Dim nbRow As Long, nbColumn As Long
+    
+    nbRow = SheetData.Range("TableMonster").Rows.Count
+    nbColumn = SheetData.Range("TableMonster").Columns.Count - 1
+    
+    Set GetTableMonster = SheetData.Range("TableMonster").Cells(0, 1).Offset(1, 1).Resize(nbRow, nbColumn)
+    
+End Function
+
+'*****************************************************************************
+' Cette fonction retourne une référence au StockItems
+'*****************************************************************************
+Public Function GetStockItem() As Range
+    
+    Dim nbRow As Long, nbColumn As Long
+    
+    nbRow = SheetData.Range("StockItem").Rows.Count
+    nbColumn = SheetData.Range("StockItem").Columns.Count - 1
+    
+    Set GetStockItem = SheetData.Range("StockItem").Cells(0, 1).Offset(1, 1).Resize(nbRow, nbColumn)
+    
+End Function
+
+'*****************************************************************************
+' Cette fonction retourne une référence au StockAutres
+'*****************************************************************************
+Public Function GetStockOther() As Range
+    
+    Dim nbColumn As Long
+    
+    nbColumn = SheetData.Range("StockOther").Columns.Count
+    
+    Set GetStockOther = SheetData.Range("StockOther").Cells(0, 1).Offset(1, 0).Resize(1, nbColumn)
+    
+End Function
+
+'*****************************************************************************
+' Cette fonction retourne une référence au CoutTotalItems
+'*****************************************************************************
+Public Function GetTotalCostItem() As Range
+    
+    Dim nbRow As Long, nbColumn As Long
+    
+    nbRow = SheetData.Range("TotalCostItem").Rows.Count
+    nbColumn = SheetData.Range("TotalCostItem").Columns.Count - 1
+    
+    Set GetTotalCostItem = SheetData.Range("TotalCostItem").Cells(0, 1).Offset(1, 1).Resize(nbRow, nbColumn)
+    
+End Function
+
+'*****************************************************************************
+' Cette fonction retourne une référence au CoutTotalAutres
+'*****************************************************************************
+Public Function GetTotalCostOther() As Range
+    
+    Dim nbColumn As Long
+    
+    nbColumn = SheetData.Range("TotalCostOther").Columns.Count
+    
+    Set GetTotalCostOther = SheetData.Range("TotalCostOther").Cells(0, 1).Offset(1, 0).Resize(1, nbColumn)
+    
+End Function
+
+'*****************************************************************************
+' Cette fonction retourne une référence à la TableUp
+'*****************************************************************************
+Public Function GetTableUp() As Range
+    
+    Set GetTableUp = SheetData.Range("TableUp").Cells(1, 1)
+    
+End Function

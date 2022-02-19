@@ -1,0 +1,3 @@
+Option Explicit
+
+Public Const nbItem As Long = 9
